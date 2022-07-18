@@ -22,6 +22,16 @@ Profesora Guía:
 
 ---
 
+Imagenes de fMRI extraidas de OpenNeuro:
+
+- [ds001454](https://openneuro.org/datasets/ds001454/versions/1.3.1)
+- [ds002422](https://openneuro.org/datasets/ds002422/versions/1.1.0)
+- [ds004101](https://openneuro.org/datasets/ds004101/versions/1.0.1)
+
+---
+
+---
+
 Con referencia:
 
 - [Pagina oficial NIbabel](https://nipy.org/nibabel/index.html) 
@@ -57,7 +67,7 @@ Imagenes realizadas por el autor del script, con apoyo de imagenes 3D de sujetos
 
 # Orientación, sistemas de coordenadas, cortes slices y función 'visual_cortes_ana'
 
-# Importamos librerias
+## Importamos librerias
 
 
 
@@ -75,55 +85,78 @@ from os.path import join as opj # Este método concatena varios componentes de r
 import nibabel as nib # Acceso de letcura/escritura y visualización de algunos formatos comunes de neuroimagen
 ```
 
-# Definimos Parametros 
+## Definimos Parametros 
 
 
 ```python
 '''
 Ruta del directorio de la data
 '''
-path_data = '/home/aracena/data/ds004101/'
+path_data = '/home/aracena/data/'
 
 '''
-Ruta donde reposa la imagen anatomica
+Ruta donde reposa las imágenes anatómicas
 '''
-path_anat = opj(path_data,'sub-09114','ses-1pre','anat')
+# Estudio ds001454
+path_ds001454 = opj(path_data,'ds001454','sub-01','ses-1')
+path_ana_ds001454 = opj(path_ds001454, 'anat','sub-01_ses-1_T1w.nii.gz')
+#sub-01_ses-1_T1w.json
+
+# Estudio ds002422
+path_ds002422 = opj(path_data,'ds002422','sub-01')
+path_ana_ds002422 = opj(path_ds002422, 'anat', 'sub-01_T1w.nii')
+#T1w.json
+
+# Estudio ds004101
+path_ds004101 = opj(path_data,'ds004101','sub-09114','ses-1pre')
+path_ana_ds004101 = opj(path_ds004101,'anat', 'sub-09114_ses-1pre_T1w.nii.gz')
+#T1w.json
 
 '''
-Ruta donde reposa la imagen funcional
+Ruta donde reposa las imágenes fisiológicas
 '''
-path_fmri = opj(path_data,'sub-09114','ses-1pre','func')
+# Estudio ds001454
+path_fis_ds001454 = opj(path_ds001454, 'func','sub-01_ses-1_task-rest_run-01_bold.nii.gz')
+
+# Estudio ds002422
+path_fis_ds002422 = opj(path_ds002422, 'func', 'sub-01_task-rest_bold.nii.gz')
+
+# Estudio ds004101
+path_fis_ds004101 = opj(path_ds004101, 'func', 'sub-09114_ses-1pre_task-rest_bold.nii.gz')
+
+
 
 '''
 Ruta donde se guardaran los resultados
 '''
-path_expe = '/home/aracena/thesis_ds004101/00_fase0_tips_nibabel_funciones/'
+path_expe = '/home/aracena/thesis_ds002422/00_fase0_tips_nibabel_funciones/'
 
 path_output = opj(path_expe,'00_02_orientacion_cortes_nibabel_and_func_visualcortes', 'output')
 path_png = opj(path_output,'archivos_png')
 
 # Crear la(s) carpeta(s) de salida
 os.system('mkdir -p %s'%path_output)
-os.system('mkdir -p %s'%path_png)
+os.system('mkdir -p %s'%path_png);
+
 
 '''
-Ruta donde se guardaran las imagenes de referencia de cortes anatómicos
+Ruta donde se reposan las imagenes de referencia de cortes anatómicos
 '''
 path_ref = opj(path_expe, '00_02_orientacion_cortes_nibabel_and_func_visualcortes', 'imagenes')
 ```
 
-# Cargamos imagenes anatomica y fisiologica
+## Cargamos imagenes anatomica y fisiologica
 
 
 ```python
 # Anatomica
-img_ana = nib.load(opj(path_anat,'sub-09114_ses-1pre_T1w.nii.gz')) # Cargamos la imagen y creamos un objeto imagen_anatomica
+img_ana = nib.load(path_ana_ds002422) # Cargamos la imagen y creamos un objeto imagen_anatomica
 
 # Fisiologica
-img_fis = nib.load(opj(path_fmri, 'sub-09114_ses-1pre_task-rest_bold.nii.gz')) # Cargamos la imagen y creamos un objeto imagen_fisiologica
+img_fis = nib.load(path_fis_ds002422) # Cargamos la imagen y creamos un objeto imagen_fisiologica
 ```
 
-# Cargar datos de la imagen
+## Cargar datos de la imagen
 
 
 ```python
@@ -158,13 +191,13 @@ print('\n----------------------------\n')
     ----------------------------
     
     Forma de la matriz_fis: 
-     (64, 64, 36, 189) ----> 4D
+     (64, 64, 36, 200) ----> 4D
     
     ----------------------------
     
 
 
-# Orientación de la imagen
+## Orientación de la imagen
 
 
 ```python
@@ -196,7 +229,7 @@ print('\n--------------------------------------\n')
     
 
 
-Para comprender/entender que significa las orientaciones de las imagenes, debemos conocer los diferentes sistemas de coordenadas al tratar con imágenes y aplicaciones médicas. Hay tres sistemas de coordenadas comúnmente utilizados en aplicaciones de imágenes y Cada sistema de coordenadas tiene un propósito y representa sus datos de diferentes maneras. Contamos con tres sistemas de refrencia:
+Para comprender/entender que significa las orientaciones de las imagenes, debemos conocer los diferentes sistemas de coordenadas al tratar con imágenes y aplicaciones médicas. Hay tres sistemas de coordenadas comúnmente utilizados en aplicaciones de imágenes y cada sistema de coordenadas tiene un propósito y representa sus datos de diferentes maneras. Contamos con tres sistemas de referencia:
 
 - Sistema de coordenadas mundial (Escaner)
 - Sistema de coordenadas anatómico (Convención Radiológica/Neurológica)
@@ -204,13 +237,13 @@ Para comprender/entender que significa las orientaciones de las imagenes, debemo
 
 La siguiente figura ilustra los tres espacios y sus correspondientes ejes.
 
-<img src="imagenes/sistemas_coordenadas.png" width="950">
+![](imagenes/sistemas_coordenadas.png)
 
-## Sistema de coordenadas mundial (escáner XYZ)
+### Sistema de coordenadas mundial (escáner XYZ)
 
-Cuando se hace referencia al sistema de coordenadas mundial en IRM, se hace referencia al sistema de coordenas del escaner de RM. Este sistema esta conformado por tres ejes ortogonales, cuyo origen de los ejes está en el isocentro del imán; esta es la coordenada (0, 0, 0) en nuestro espacio de referencia. Las unidades para los tres ejes son milímetros. Para definir la dirección de los ejes, imaginemosnos un observador parado detrás del escáner mirando a través del orificio del imán hacia el final de la cama del escáner, como se observa en la figura.
+Cuando se hace referencia al sistema de coordenadas mundial en IRM, se hace referencia al sistema de coordenadas del escáner de RM. Este sistema está conformado por tres ejes ortogonales, cuyo origen de los ejes está en el isocentro del imán; esta es la coordenada (0, 0, 0) en nuestro espacio de referencia. Las unidades para los tres ejes son milímetros. Para definir la dirección de los ejes, imaginemos un observador parado detrás del escáner mirando a través del orificio del imán hacia el final de la cama del escáner, como se observa en la figura.
 
-<img src="imagenes/sistemas_coordenadas_equipo.png" width="750">
+![](imagenes/sistemas_coordenadas_equipo.png)
 
 Dibuje una línea que viaja hacia el observador a través del centro del orificio del imán, paralela al piso/cama, con el punto cero en el isocentro del imán y los valores positivos más cerca del observador. Llame a esta línea el eje del orificio del escáner (eje z).
 
@@ -222,7 +255,7 @@ Este sistema de referencia a veces se conoce como "escáner XYZ".
 
 Una coordenada de (x,y,z)=(-20,10,−30) en el sistema mundial, nos indica que el punto se encuentra a 20 mm a la izquierda (del observador ficticio) del isocentro, a 10 mm hacia el techo y a 30 mm hacia el pie de la cama del escáner.
 
-## Sistema de coordenadas anatómico (Convención Radiológica/Neurológica)
+### Sistema de coordenadas anatómico (Convención Radiológica/Neurológica)
 
 El sistema de coordenadas anatómico consta de tres planos para describir la posición anatómica estándar de un ser humano:
 
@@ -230,45 +263,44 @@ El sistema de coordenadas anatómico consta de tres planos para describir la pos
 - Plano axial: separa la cabeza (Superior) de los pies (Inferior),
 - Plano coronal: separa el frente de (Anterior) la espalda (Posterior).
 
+![](imagenes/planos_anatomicos.png)
 
-<img src="imagenes/planos_anatomicos.png" width="950">
-
-En la figura podemos observar como el sujeto se encuentra en la camilla en posición decubito supino (posición corporal acostado boca arriba en un plano paralelo al suelo), donde el eje escáner izquierda/derecha coincide con el eje izquierda/derecha del sujeto, el eje escáner suelo/techo es el eje posterior/anterior, y el eje del orificio del escáner es el eje inferior/superior del sujeto; podriamos concluir que al menos los ejes del escáner coinciden con los ejes anatómicos. Pero, si el sujeto se encuentra en camilla en posición decubito prono (posición corporal acostado boca abajo en un plano paralelo al suelo), solo coincidiria el eje del orificio del escáner (eje z) con en el eje inferior/superior del sujeto, por lo tanto, el sistema de referencia munidal no nos informará sobre la izquierda y la derecha del sujeto, sino solo sobre la izquierda y la derecha del escáner. Es por esta razón, de la necesidad de saber dónde estamos en términos de la izquierda y la derecha del sujeto, que se utiliza los sistemas de coordenadas anatómicos centrados en el sujeto. La mayoría de los formatos de archivo utilizan dos convenciones:
+En la figura podemos observar como el sujeto se encuentra en la camilla en posición decúbito supino (posición corporal acostado boca arriba en un plano paralelo al suelo), donde el eje escáner izquierda/derecha coincide con el eje izquierda/derecha del sujeto, el eje escáner suelo/techo es el eje posterior/anterior, y el eje del orificio del escáner es el eje inferior/superior del sujeto; podríamos concluir que al menos los ejes del escáner coinciden con los ejes anatómicos. Pero, si el sujeto se encuentra en camilla en posición decúbito prono (posición corporal acostado boca abajo en un plano paralelo al suelo), solo coincidiría el eje del orificio del escáner (eje z) con en el eje inferior/superior del sujeto, por lo tanto, el sistema de referencia mundial no informará sobre la izquierda y la derecha del sujeto, sino solo sobre la izquierda y la derecha del escáner. Es por esta razón, de la necesidad de saber dónde estamos en términos de la izquierda y la derecha del sujeto, que se utiliza los sistemas de coordenadas anatómicos centrados en el sujeto. La mayoría de los formatos de archivo utilizan dos convenciones:
 
 - Convención neurológica
 - Convención radiológica
 
 En estos sistemas, los ejes siguen siendo los ejes del escáner, pero el orden y la dirección de los ejes provienen de la posición del sujeto.
 
-### Convención neurológica (RAS)
+#### Convención neurológica (RAS)
 
-A los neurólogos les gusta mirar imágenes del cerebro con el lado derecho del paciente a la derecha de la imagen. Esta perspectiva es como si el neurólogo estuviera mirando el corte de la parte superior de la cabeza del paciente (como se ilustra en la figura, nos imaginamos que el punto de vista del neurológo es como si estuiera posicionado detras del equipo a el extremo superior de la camilla) y, por lo tanto, apuntan el eje x de izquierda (left) a derecha (Right) del sujeto, el eje y de posterior (posterior) a anterior (Anterior) del sujeto y el eje z de los pies (inferior) a la cabeza (Superior) del sujeto. Este sistema de coordenadas se denomina "RAS" (Right, Anterior y Superior), siendo el ás común en neuroimagen y se ilustra en la figura.
+A los neurólogos les gusta mirar imágenes del cerebro con el lado derecho del paciente a la derecha de la imagen. Esta perspectiva es como si el neurólogo estuviera mirando el corte de la parte superior de la cabeza del paciente (como se ilustra en la figura, nos imaginamos que el punto de vista del neurólogo es como si estuviera posicionado detrás del equipo a el extremo superior de la camilla) y, por lo tanto, apuntan el eje x de izquierda (left) a derecha (Right) del sujeto, el eje y de posterior (posterior) a anterior (Anterior) del sujeto y el eje z de los pies (inferior) a la cabeza (Superior) del sujeto. Este sistema de coordenadas se denomina "RAS" (Right, Anterior y Superior), siendo el más común en neuroimagen y se ilustra en la figura.
 
-<img src="imagenes/sistemas_coordenadas_neurologico.png" width="950">
+![](imagenes/sistemas_coordenadas_neurologico.png)
 
-### Convención radiológica (LPS)
+#### Convención radiológica (LPS)
 
-A los radiólogos les gusta mirar sus imágenes con la izquierda del paciente a la derecha de la imagen. Si están mirando una imagen del cerebro, es como si estuvieran mirando el corte del cerebro desde el punto de vista de los pies del paciente (como se ilustra en la figura, nos imaginamos que el punto de vista del radiológo es como si estuiera posicionado a los pies del paciente a el extremo inferior de la camilla), y, por lo tanto, apuntan el eje x de derecha (right) a izquierda (Left) del sujeto, el eje y de anterior (anterior) a posterior (Posterior)  del sujeto y el eje z de los pies (inferior) a la cabeza (Superior) del sujeto. Este sistema de coordenadas se denomina "LPS" (Left, Posteior y Superior).
+A los radiólogos les gusta mirar sus imágenes con la izquierda del paciente a la derecha de la imagen. Si están mirando una imagen del cerebro, es como si estuvieran mirando el corte del cerebro desde el punto de vista de los pies del paciente (como se ilustra en la figura, nos imaginamos que el punto de vista del radiólogo es como si estuviera posicionado a los pies del paciente a el extremo inferior de la camilla), y, por lo tanto, apuntan el eje x de derecha (right) a izquierda (Left) del sujeto, el eje y de anterior (anterior) a posterior (Posterior)  del sujeto y el eje z de los pies (inferior) a la cabeza (Superior) del sujeto. Este sistema de coordenadas se denomina "LPS" (Left, Posteior y Superior).
 
-<img src="imagenes/sistemas_coordenadas_radiologico.png" width="950">
+![](imagenes/sistemas_coordenadas_radiologico.png)
 
-Es importamte destacar, que DICOM usa la convención radiológica mientras que NIFTI usa la convención neurológica.
+Es importante destacar que, DICOM usa la convención radiológica mientras que NIFTI usa la convención neurológica.
 
-La pagina oficial de Nipype nos muestra imagen de un derrame cerebral en el lóbulo temporal izquierdo (lo que provoca un área oscura en la IRM), donde compara estas convenciones de visualización, mostrando las direcciones en las que están pensando el neurólogo y el radiólogo.
+La página oficial de Nipype nos muestra imagen de un derrame cerebral en el lóbulo temporal izquierdo (lo que provoca un área oscura en la IRM), donde compara estas convenciones de visualización, mostrando las direcciones en las que están pensando el neurólogo y el radiólogo.
 
-<img src="imagenes/sistema_coordenadas_radioneuro.png" width="350">
+![](imagenes/sistema_coordenadas_radioneuro.png)
 
-### Otras orientaciones anatomicas usadas
+#### Otras orientaciones anatómicas usadas
 
-Existen otras configuraciones para orientar el sistema de corrdenadas anatómico, por ejemplo, el sitema LAS o PSR, los cuales se orientan siguiendo la regla de la mano izquierda y se ilustran en las siguientes figuras.
+Existen otras configuraciones para orientar el sistema de coordenadas anatómico, por ejemplo, el sistema LAS o PSR, los cuales se orientan siguiendo la regla de la mano izquierda y se ilustran en las siguientes figuras.
 
-<img src="imagenes/sistemas_coordenadas_LAS.png" width="850">
+![](imagenes/sistemas_coordenadas_LAS.png)
 
-<img src="imagenes/sistemas_coordenadas_PSR.png" width="850">
+![](imagenes/sistemas_coordenadas_PSR.png)
 
-## Sistema de coordenadas voxels (IJK)
+### Sistema de coordenadas voxels (IJK)
 
-Como se describio en el script de python **00_01_atributos_nibabel_and_func_atributoimg.ipynb**, la imagen nifti esta compuesta por:
+Como se describió en el script de python **00_00_atributos_nibabel_and_func_atributoimg.ipynb**, la imagen nifti esta compuesta por:
     
     - una matriz de N dimensiones que contiene los datos de la imagen,
 
@@ -281,32 +313,34 @@ Los datos de imágenes digitales sin metadatos descriptivos no tienen sentido, y
 Un archivo de una neuroimagen consta de una línea de bytes consecutivos; una imagen bidimensional primero debe transformarse en una matriz lineal de píxeles de imagen antes de que pueda almacenarse. Como se ilustra en la figura (centro), el método para escribir una imagen 2D en un archivo puede entenderse visualizando los píxeles como cuentas en una hebra de hilo. El hilo comienza en el primer píxel de la esquina superior izquierda de la imagen y pasa a través de los píxeles de la fila superior de la imagen. Vuelve al primer píxel de la siguiente fila repetidamente hasta que llega al último píxel de la última fila.
 
 
-<img src="imagenes/sistema_coordenadas_voxel_1.png" width="850">
+![](imagenes/sistema_coordenadas_voxel_1.png)
 
 Debido a que el ancho y el alto de la imagen se pierden en este proceso, se debe agregar información adicional al archivo de imagen para reconstruir y mostrar la imagen. Esta información adicional también puede incluir otras propiedades de la imagen, como el tamaño de cada píxel y la cantidad de componentes de color.  Si se escribe más de una imagen, debe estar presente el número total de imágenes. Esta información adicional se denomina metadatos de imagen.
 
-<img src="imagenes/sistema_coordenadas_voxel_2.png" width="850">
+![](imagenes/sistema_coordenadas_voxel_2.png)
 
-Los métodos de formación de imágenes en RM (0 CT) dan como resultado representaciones volumétricas tridimensionales de los datos, como por ejemplo de la imagen, con 5x5x5 vóxeles. Puede pensar que esta representación tiene un sistema de coordenadas de "vóxel", donde el vóxel (1, 1, 1) es el primero y (5, 5, 5) es el último en el volumen. Sin embargo, el sistema de coordenadas de vóxel no especifica las dimensiones geométricas (p. ej., mm o cm) y no especifica cómo se relaciona la anatomia del sujeto (que está en algún lugar dentro del volumen) con los índices de vóxel. Por lo tanto, una descripción volumétrica de los datos de imagen como una matriz tridimensional debe complementarse con una descripción del sistema de coordenadas anatomica descrita en la sección anterior.
+Los métodos de formación de imágenes en RM (ó CT) dan como resultado representaciones volumétricas tridimensionales de los datos, como por ejemplo de la imagen, con 5x5x5 vóxeles. Puede pensar que esta representación tiene un sistema de coordenadas de "vóxel", donde el vóxel (1, 1, 1) es el primero y (5, 5, 5) es el último en el volumen. Sin embargo, el sistema de coordenadas de vóxel no especifica las dimensiones geométricas (p. ej., mm o cm) y no especifica cómo se relaciona la anatomía del sujeto (que está en algún lugar dentro del volumen) con los índices de vóxel. Por lo tanto, una descripción volumétrica de los datos de imagen como una matriz tridimensional debe complementarse con una descripción del sistema de coordenadas anatómica descrita en la sección anterior.
 
-### Como se almacenan los datos en la matriz
+#### Como se almacenan los datos en la matriz
 
-El sistema de coordenadas de voxels es conocido como sistema IJK, donde i corresponde al eje 0, j al eje 1 y k al eje 2 en una representación matricial, datos_img[ i, j, k ]. 
+El sistema de coordenadas de vóxeles es conocido como sistema IJK, donde i corresponde al eje 0, j al eje 1 y k al eje 2 en una representación matricial, datos_img[ i, j, k ]. 
 
-Segun la orientación y secuencia del sistema de referencia del plano anatomicó, es como se guardaran los datos en la matriz. Si, el sistema de anatomico elegido al momento de la adquisición de las imágenes es la convención neurológica, RAS (figura abajo), nos indicará que el eje 0 de la matriz contiene los valores que aumentan de derecha a izquierda (x), el eje 1 contiene los valores que aumentan de posterior a anterior (y) y el eje 2 contiene los valores que aumentan de anterior a superior (z); de esta manera, los datos de la imagen están representados como datos_img[ x, y, z ].
+Según la orientación y secuencia del sistema de referencia del plano anatómico, es como se guardarán los datos en la matriz. Si, el sistema de anatómico elegido al momento de la adquisición de las imágenes es la convención neurológica, RAS (figura abajo), nos indicará que el eje 0 de la matriz contiene los valores que aumentan de derecha a izquierda (x), el eje 1 contiene los valores que aumentan de posterior a anterior (y) y el eje 2 contiene los valores que aumentan de anterior a superior (z); de esta manera, los datos de la imagen están representados como datos_img[ x, y, z ].
 
-<img src="imagenes/sistema_coordenadas_voxel_ras.png" width="850">
+![](imagenes/sistema_coordenadas_voxel_ras.png)
 
-Si, el sistema de anatomico elegido al momento de la adquisición de las imágenes es la convención neurológica, PSR (figura abajo), nos indicará que el eje 0 de la matriz contiene los valores que aumentan de anterior a posterior a anterior (y) , el eje 1 contiene los valores que aumentan anterior a superior (z) y el eje 2 contiene los valores que aumentan de de derecha a izquierda (x) ; de esta manera, los datos de la imagen están representados como datos_img[ y, z, x ].
 
-<img src="imagenes/sistema_coordenadas_voxel_psr.png" width="850">
+Si, el sistema de anatómico elegido al momento de la adquisición de las imágenes es la convención neurológica, PSR (figura abajo), nos indicará que el eje 0 de la matriz contiene los valores que aumentan de anterior a posterior a anterior (y) , el eje 1 contiene los valores que aumentan anterior a superior (z) y el eje 2 contiene los valores que aumentan de derecha a izquierda (x) ; de esta manera, los datos de la imagen están representados como datos_img[ y, z, x ].
 
-Como podemos observar, es importante al momento de trabajar datos de imágenes digitales, conocer los metadatos descriptivos, ya que entre los distintos datos que contiene sobre de las propiedades de las imágenes, nos indicara en que sistemas de referncias fueron adquiridas las imagenes.
+![](imagenes/sistema_coordenadas_voxel_psr.png)
+
+Como podemos observar, es importante al momento de trabajar datos de imágenes digitales, conocer los metadatos descriptivos, ya que entre los distintos datos que contiene sobre de las propiedades de las imágenes, nos indicara en que sistemas de referencias fueron adquiridas las imágenes.
 
 Además, existe otro tipo de metadatos de imagen aparte de las propiedades de las imágenes. Estos metadatos describen el sujeto que se escanea y la adquisición de las imágenes; por ejemplo, el nombre del sujeto, el fabricante del dispositivo de imágenes, la fecha y hora en que se adquirieron las imágenes, la sustancia inyectada en el sujeto. Tener esta información almacenada con las imágenes es crucial para una amplia gama de procesos automatizados, así como para permitir que los humanos comprendan el contexto y el origen de las imágenes. No todas las imágenes digitales se producen de la misma manera; sin embargo, todas contienen datos de imágenes (píxeles) y metadatos descriptivos.
 
+
 &nbsp;
-# Cortes de Slices en Imagenes
+## Cortes de Slices en Imagenes
 
 A veces es útil manipular la forma de una imagen manteniéndola en el mismo sistema de coordenadas. El atributo
     
@@ -316,11 +350,11 @@ proporciona una interfaz de corte de matriz para producir nuevas imágenes con u
 
 &nbsp;
 
-Utilizaremos la imagen anatomica (*img_ana*) para los cortes de slices:
+Utilizaremos la imagen anatómica (*img_ana*) para los cortes de slices:
 
-## Cortes de slices en imagen anatómica (3D)
+### Cortes de slices en imagen anatómica (3D)
 
-### Cortar los primeros X slices de la imagen en la dirección *k* del sistema de coordenas voxels
+#### Cortar los primeros X slices de la imagen en la dirección *k* del sistema de coordenas voxels
 
 
 ```python
@@ -354,7 +388,7 @@ print('\n-----------------------------------------------------------------------
     
 
 
-### Cortar los primeros X y ultimos X slices en la dirección *k* del sistema de coordenas voxels
+#### Cortar los primeros X y ultimos X slices en la dirección *k* del sistema de coordenas voxels
 
 
 ```python
@@ -388,7 +422,7 @@ print('\n-----------------------------------------------------------------------
     
 
 
-### Seleccionar un corte en la dirección *k* del sistema de coordenas voxels
+#### Seleccionar un corte en la dirección *k* del sistema de coordenas voxels
 
 Le indicamos al usuario que ingrese el corte que desea seleccionar
 
@@ -460,7 +494,7 @@ else:
     
 
 
-### Visualizar el corte seleccionado
+#### Visualizar el corte seleccionado
 
 Cargamos los datos del corte seleccionado (*cor*)
 
@@ -510,7 +544,7 @@ Por lo tanto, si seleccionamos cortes en la dirección *k* en el sistema de coor
 
 En este sistema 'PSR', si queremos visualizar los cortes coronales que corresponde al plano XZ en el sistema de coordenadas mundial, debe seleccionarse en la dirección *i* en el sistema de coordenadas voxel, mientras que los cortes axiales que corresponde al plano XY en el sistema de coordenadas mundial, debemos seleccionar en la dirección *j* en el sistema de coordenadas voxel.
 
-### Guardar el corte seleccionado
+#### Guardar el corte seleccionado
 
 
 ```python
@@ -534,9 +568,9 @@ img_again.shape
 
 
 &nbsp;
-## Corte de slices en imagen fisiológica (4D)
+### Corte de slices en imagen fisiológica (4D)
 
-### Cortar los primeros X volumenes de la IF
+#### Cortar los primeros X volumenes de la IF
 
 
 
@@ -560,18 +594,18 @@ print('\n-----------------------------------------------------------------------
     -----------------------------------------------------------------------------
     
     Forma de la matriz_fis: 
-     (64, 64, 36, 189) ------> original
+     (64, 64, 36, 200) ------> original
     
     -----------------------------------------------------------------------------
     
     Forma del segmento matriz_fis: 
-     (64, 64, 36, 179) ------> se recortaron los primeros 10 volumes de la imagen
+     (64, 64, 36, 190) ------> se recortaron los primeros 10 volumes de la imagen
     
     -----------------------------------------------------------------------------
     
 
 
-### Cortar los primeros X y ultimos X volumenes de IF
+#### Cortar los primeros X y ultimos X volumenes de IF
 
 
 ```python
@@ -594,18 +628,18 @@ print('\n-----------------------------------------------------------------------
     ------------------------------------------------------------------------------
     
     Forma de la matriz_fis: 
-     (64, 64, 36, 189) ------> original
+     (64, 64, 36, 200) ------> original
     
     ------------------------------------------------------------------------------
     
     Forma del segmento matriz_fis: 
-     (64, 64, 36, 163) ------> 26 volumenes recortados: 13 al inicio y 13 al final
+     (64, 64, 36, 174) ------> 26 volumenes recortados: 13 al inicio y 13 al final
     
     ------------------------------------------------------------------------------
     
 
 
-### Seleccion de los primeros X volumenes
+#### Seleccion de los primeros X volumenes
 
 
 ```python
@@ -626,7 +660,7 @@ print('\n---------------------------------------\n')
     
 
 
-### Utilizar un paso entero al cortar
+#### Utilizar un paso entero al cortar
 
 
 ```python
@@ -641,13 +675,13 @@ print('\n---------------------------------------\n')
     
     ---------------------------------------
     
-    (32, 32, 18, 189) ---> forma del volumen
+    (32, 32, 18, 200) ---> forma del volumen
     
     ---------------------------------------
     
 
 
-### Seleccion de un volumen para extraer un corte
+#### Seleccion de un volumen para extraer un corte
 
 
 ```python
@@ -663,7 +697,7 @@ print(vol.shape, '--->', 'forma del volumen', vol_sel)
     (64, 64, 36) ---> forma del volumen 4
 
 
-### Seleccionar un corte en la dirección *k* del sistema de coordenas voxels
+#### Seleccionar un corte en la dirección *k* del sistema de coordenas voxels
 
 Le indicamos al usuario que ingrese el corte que desea seleccionar
 
@@ -735,7 +769,7 @@ else:
     
 
 
-### Visualizar el corte seleccionado
+#### Visualizar el corte seleccionado
 
 Cargamos los datos del corte seleccionado (*cor*)
 
@@ -769,7 +803,7 @@ Por lo tanto, si seleccionamos cortes en la dirección *k* en el sistema de coor
 
 En este sistema 'LAS', si queremos visualizar los cortes sagitales que corresponde al plano YZ en el sistema de coordenadas mundial, debemos seleccionar en la dirección *i* en el sistema de coordenadas voxel, mientras que los cortes coronales que corresponde al plano XZ en el sistema de coordenadas mundial, debe seleccionarse en la dirección *j* en el sistema de coordenadas voxel.
 
-### Guardar el corte seleccionado
+#### Guardar el corte seleccionado
 
 
 ```python
@@ -797,20 +831,19 @@ print('\n-------------------------------------\n')
     
 
 
-# Creación de funcion 'visual_cortes_ana'
+## Creación de funcion 'visual_cortes_ana'
 
 La siguiente función genera la visualización de los cortes anatómico de varias imágenes (hasta cuatro), requiriendo como inputs:
 
 - img: Diccionario con las imágenes nifti
 - vol: Volumen donde se desea visualizar los cortes anatómicos
-- vox: Posición i,j,k del voxel sobre el cual se proyectarán los cortes
+- voxel: Posición i,j,k del voxel sobre el cual se proyectarán los cortes
 
 Obteniendo como output los diferentes cortes anatómicos sobre un voxel de las imágenes ingresadas en 'img'.
 
-El input 'vox' es la posición i,j,k en el sistema de coordenadas voxel y sobre el cual se extraerán los tres planos anatómicos (sagital, coronal y axial) según el sistema de referencia anatómico con que se adquirieron las imágenes. En la imagen se ilustra como en un volumen de 5x5x5 voxeles, elegimos el voxel (3,4,2) para visualizar los cortes sobre dicho voxel.
+El input 'vox' es la posición i,j,k en el sistema de coordenadas voxel y sobre el cual se extraerán los tres planos anatómicos (sagital, coronal y axial) según el sistema de referencia anatómico con que se adquirieron las imágenes. En la imagen se ilustra como en un volumen de 5x5x5 vóxeles, elegimos el voxel (3,4,2) para visualizar los cortes sobre dicho voxel.
 
-
-<img src="imagenes/funcion_cortes_ana.png" width="850">
+![](imagenes/funcion_cortes_ana.png)
 
 
 ```python
@@ -821,8 +854,7 @@ Inputs:
 
 - img: Diccionario con las imágenes nifti
 - vol: Volumen donde se desea visualizar los cortes anatómicos
-- vox: Posición i,j,k del voxel sobre el cual se proyectarán los cortes
-#- nom_img = nombre de la imagen con que se desea visualizar y guardar
+- voxel: Posición i,j,k del voxel sobre el cual se proyectarán los cortes
 
 Outputs:
 - plot de los diferentes cortes anatómicos sobre un voxel de las imágenes ingresadas en 'img'
@@ -833,10 +865,7 @@ def visual_cortes_ana(img, vol, voxel):
     import numpy as np
     import matplotlib.pyplot as plt
     import matplotlib.image as mpimg
-    
-    # Creamos una lista de las posibles orientaciones
-    orientaciones = [('L', 'A', 'S'), ('P', 'S', 'R')]
-    
+   
     # Creamos una lista con las claves del diccionario ingresado
     lista_img = list(img.keys())
 
@@ -854,46 +883,51 @@ def visual_cortes_ana(img, vol, voxel):
         # creamos un nombre para la grafica
         a = ','.join(orientacion)
         nomb_ori[ima] = '('+ a +')'
+        
+        #cargamos datos de la imagen
+        datos_img[ima] = img[ima].get_fdata()
+        ta = len(datos_img[ima].shape)
+        if ta == 4:
+            datos_img[ima] = datos_img[ima][...,vol]
+        else:
+            datos_img[ima] = datos_img[ima][...]
 
-        #se extraen valores x, y, z del voxel ingresado
-        eje = []
-        for i in range(len(orientacion)):
-            #vox = voxel[i]
-            ori = str(orientacion[i])
+        #se extraen valores x, y, z del voxel ingresado y cortes segun posición anatómica
+        for j in range(len(orientacion)):
+            ori = str(orientacion[j])
+
             if  ori == 'L'or ori == 'R':
-                x_cor[ima] = voxel[i]
+                x_cor[ima] = voxel[j]
+                
+                # corte segun posición anatómica
+                if j == 0:
+                    corte_sag[ima] = datos_img[ima][x_cor[ima],:,:]
+                elif j == 1:
+                    corte_sag[ima] = datos_img[ima][:,x_cor[ima],:]
+                elif j == 2:
+                    corte_sag[ima] = datos_img[ima][:,:,x_cor[ima]]
 
             elif ori == 'A' or ori == 'P':
-                y_cor[ima] = voxel[i]
+                y_cor[ima] = voxel[j]
+                
+                # corte segun posición anatómica
+                if j == 0:
+                    corte_cor[ima] = datos_img[ima][y_cor[ima],:,:]
+                elif j == 1:
+                    corte_cor[ima] = datos_img[ima][:,y_cor[ima],:]
+                elif j == 2:
+                    corte_cor[ima] = datos_img[ima][:,:,y_cor[ima]]
 
             elif ori == 'I'or ori == 'S':
-                z_cor[ima] = voxel[i]
-
-        # Extraemos los cortes
-        datos_img[ima] = img[ima].get_fdata()
-        
-        if (orientacion==orientaciones[0]) == True:
-            ta = len(datos_img[ima].shape)
-            if ta == 4:
-                corte_sag[ima] = datos_img[ima][x_cor[ima],:, :,vol]
-                corte_cor[ima] = datos_img[ima][:, y_cor[ima], :,vol]
-                corte_axi[ima] = datos_img[ima][:, :,z_cor[ima],vol]
-            else:
-                corte_sag[ima] = datos_img[ima][x_cor[ima],:,:]
-                corte_cor[ima] = datos_img[ima][:,y_cor[ima],:]
-                corte_axi[ima] = datos_img[ima][:,:,z_cor[ima]]
+                z_cor[ima] = voxel[j]
                 
-        if (orientacion==orientaciones[1]) == True:
-            ta = len(datos_img[ima].shape)
-            if ta == 4:
-                corte_sag[ima] = datos_img[ima][:, :,x_cor[ima],vol]
-                corte_cor[ima] = datos_img[ima][y_cor[ima], :, :,vol]
-                corte_axi[ima] = datos_img[ima][:, z_cor[ima], :,vol]
-            else:
-                corte_sag[ima] = datos_img[ima][:,:,x_cor[ima]]
-                corte_cor[ima] = datos_img[ima][y_cor[ima],:,:]
-                corte_axi[ima] = datos_img[ima][:,z_cor[ima],:]
-
+                # corte segun posición anatómica
+                if j == 0:
+                    corte_axi[ima] = datos_img[ima][z_cor[ima],:,:]
+                elif j == 1:
+                    corte_axi[ima] = datos_img[ima][:,z_cor[ima],:]
+                elif j == 2:
+                    corte_axi[ima] = datos_img[ima][:,:,z_cor[ima]]
     
     # Definimos estilo de letra para la grafica
     font1 = {'fontsize':18, 'fontweight':'bold', 'color':'tab:blue'}
@@ -964,9 +998,9 @@ def visual_cortes_ana(img, vol, voxel):
     plt.show()
     
     # cargamos imagen de referencia de los cortes anatomicos
-    img_cor_sag = mpimg.imread(opj(path_ref,'corte_sagital.png'))
-    img_cor_cor = mpimg.imread(opj(path_ref,'corte_coronal.png'))
-    img_cor_axi = mpimg.imread(opj(path_ref,'corte_axial.png'))
+    img_cor_sag = mpimg.imread(opj(path_ref,'corte_sagital_ref.png'))
+    img_cor_cor = mpimg.imread(opj(path_ref,'corte_coronal_ref.png'))
+    img_cor_axi = mpimg.imread(opj(path_ref,'corte_axial_ref.png'))
 
     img_cor = [img_cor_sag,img_cor_cor,img_cor_axi]
 
@@ -987,7 +1021,52 @@ def visual_cortes_ana(img, vol, voxel):
     plt.plot()
 ```
 
-## Ejecutamos función
+### Ejecutamos función para cada imagen
+
+
+```python
+img_pru = {'anatomica_ds002422': img_ana}
+
+visual_cortes_ana(img= img_pru,
+                 vol= 0,
+                 voxel=(158,182,90))
+```
+
+
+    
+![png](output_80_0.png)
+    
+
+
+
+    
+![png](output_80_1.png)
+    
+
+
+
+```python
+img_pru = {'funcional_ds002422': img_fis}
+visual_cortes_ana(img= img_pru,
+                 vol= 0,
+                 voxel=(30,31,18))
+```
+
+
+    
+![png](output_81_0.png)
+    
+
+
+
+    
+![png](output_81_1.png)
+    
+
+
+### Ejecutamos función con ambas imágenes 
+
+Una alternativa de ejecutar la función con ambas imágenes, erepresentando el resultado de tanto de la imagen anatomica y funcional en una sola imagen. Para ello creamos un diccionario con las imagenes que seran input de la función.
 
 
 ```python
@@ -1003,17 +1082,17 @@ visual_cortes_ana(img= img_pru,
 
 
     
-![png](output_81_0.png)
+![png](output_85_0.png)
     
 
 
 
     
-![png](output_81_1.png)
+![png](output_85_1.png)
     
 
 
-# Tiempo de ejecución
+## Tiempo de ejecución
 
 
 ```python
@@ -1032,14 +1111,14 @@ print('--------------------------------------')
     --------------------------------------
     tiempo de ejecución
     
-     46.187 seg
-     0.77 min
+     21.161 seg
+     0.353 min
     --------------------------------------
     tiempo de ejecución del sistema y CPU
     
-     9.226 seg
-     0.154 min
+     9.044 seg
+     0.151 min
     --------------------------------------
 
 
-# Fin
+## Fin
